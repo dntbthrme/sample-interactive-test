@@ -1,17 +1,12 @@
-# Debugging Exercise
+# Fix the Calculation
 
-Practice debugging by fixing a simple calculation bug.
+<img src="https://octodex.github.com/images/Professortocat_v2.png" align="right" height="200px" />
 
-## What you'll learn
+Hey dntbthrme!
 
-- Debugging
-- Git branches
-- Pull Requests
-- Automated testing
-- Merging changes
+Mona here. I'm done preparing your exercise. Hope you enjoy! 💚
 
-## Start the exercise
+Remember, it's self-paced so feel free to take a break! ☕️
 
-Click the button below to create your own copy of this exercise.
+[![](https://img.shields.io/badge/Go%20to%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/dntbthrme/sample-interactive-test/issues/1)
 
-[![Start Exercise](https://img.shields.io/badge/Start%20Exercise-2ea44f?style=for-the-badge&logo=github)](https://github.com/dntbthrme/sample-interactive/generate)
