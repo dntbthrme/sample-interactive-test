@@ -1,0 +1,82 @@
+name: Step 1
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches:
+      - main
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+  pull-requests: read
+
+env:
+  STEP_2_FILE: ".github/steps/2-merge.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.9.3
+
+  check_calculation:
+    name: Check Calculation
+
+    needs:
+      - find_exercise
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout learner solution
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run automated tests
+        run: npm test
+
+  post_merge_instruction:
+    name: Post Merge Instruction
+
+    needs:
+      - find_exercise
+      - check_calculation
+
+    runs-on: ubuntu-latest
+
+    env:
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+      ISSUE_REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Post merge instructions
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_2_FILE }}
+
+      - name: Disable Step 1
+        run: gh workflow disable "Step 1"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable Step 2
+        run: gh workflow enable "Step 2"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

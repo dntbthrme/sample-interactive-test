@@ -1,0 +1,66 @@
+name: Step 2
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+  pull-requests: read
+
+env:
+  REVIEW_FILE: ".github/steps/x-review.md"
+
+jobs:
+  find_exercise:
+    name: Find Exercise Issue
+
+    if: github.event.pull_request.merged == true
+
+    uses: skills/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.9.3
+
+  post_review:
+    name: Post Exercise Review
+
+    needs:
+      - find_exercise
+
+    runs-on: ubuntu-latest
+
+    env:
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+      ISSUE_REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Post completion review
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.REVIEW_FILE }}
+
+      - name: Disable Step 2
+        run: gh workflow disable "Step 2"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  finish_exercise:
+    name: Finish Exercise
+
+    needs:
+      - find_exercise
+      - post_review
+
+    uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@v0.9.3
+
+    with:
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
+      exercise-title: "Fix the Calculation"
